@@ -12,7 +12,8 @@ Analog Front End para el sistema Mew monofasico.
 */
 #include "ADE7753.h"
 #include <string.h>
-
+#include <Arduino.h>
+#include <SPI.h>
 
 /** === ADE7753 ===
 * Class constructor, sets chip select pin (CS define) and SPI communication with MCU.
@@ -26,8 +27,8 @@ Analog Front End para el sistema Mew monofasico.
 
 void ADE7753::Init(void){
 	// SPI Init
-	  pinMode((AFECS+8),OUTPUT);
-	digitalWrite((AFECS+8), HIGH);//disabled by default
+	pinMode(AFECS,OUTPUT);
+	digitalWrite(AFECS, HIGH);//disabled by default
 	SPI.setDataMode(SPI_MODE2);
 	SPI.setClockDivider(SPI_CLOCK_DIV2);
 	SPI.setBitOrder(MSBFIRST);
@@ -61,8 +62,7 @@ void ADE7753::closeSPI(void) {
 *
 */
 void ADE7753::enableChip(void){
- // digitalWrite((AFECS+8),LOW);
-    bitClear(PORTB, AFECS); // 0: Ardu pin 8 / 1: Ardu pin 9 / 2: Ardu pin 10.
+  digitalWrite(AFECS,LOW);
 }
 
 
@@ -72,8 +72,7 @@ void ADE7753::enableChip(void){
 *
 */
 void ADE7753::disableChip(void){
-//  digitalWrite((AFECS+8),HIGH);
-   bitSet(PORTB, AFECS);  // 0: Ardu pin 8 / 1: Ardu pin 9 / 2: Ardu pin 10.
+  digitalWrite(AFECS,HIGH);
 }
 
 
@@ -320,7 +319,7 @@ void ADE7753::setInterrupts(int i){
     write16(IRQEN,i);
 }
 int ADE7753::getStatus(void){
-    return read16(STATUS);
+    return read16(STATUSR);
 }
 int ADE7753::resetStatus(void){
     return read16(RSTSTATUS);

@@ -37,7 +37,7 @@ Defines
 #define LVARENERGY 	0x08//			24
 #define MODE 		0x09//			16
 #define IRQEN 		0x0A//			16
-#define STATUS 		0x0B//			16
+#define STATUSR 		0x0B//			16
 #define RSTSTATUS 	0x0C//			16
 #define CH1OS 		0x0D//			8
 #define CH2OS 		0x0E//			8
