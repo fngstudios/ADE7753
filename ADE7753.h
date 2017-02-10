@@ -9,7 +9,7 @@ Last update: 7 Dic 2012
 Analog Front End para el sistema Mew monofasico.
 
 
-*/  
+*/
 #ifndef ADE7753_H
 #define ADE7753_H
 
@@ -18,14 +18,14 @@ Defines
 =================================================================================================*/
 
 // Class Atributes
-#define AFECS 1                	//Chip Select ADE7753 se le suma luego 8 para compatibilizar con la funcion digitalWrite()  
+#define AFECS 1                	//Chip Select ADE7753 se le suma luego 8 para compatibilizar con la funcion digitalWrite()
 #define WRITE 0x80				//Valor del addres para la funcion Write.
 #define CLKIN 3579545         	//ADE7753 frec, max 4MHz
-#define PERIODO 50				//Frecuencia de Red   
- 
- 
+#define PERIODO 50				//Frecuencia de Red
+
+
 //Register address
- 
+
 //------Name--------Address---------Lenght
 #define WAVEFORM 	0x01//			24
 #define AENERGY 	0x02//			24
@@ -82,17 +82,17 @@ Bit Location	Bit Mnemonic	Default Value 		Description
 1				DISLPF2			0					LPF (low-pass filter) after the multiplier (LPF2) is disabled when this bit is set.
 2				DISCF			1					Frequency output CF is disabled when this bit is set.
 3				DISSAG			1					Line voltage sag detection is disabled when this bit is set.
-4				ASUSPEND		0					By setting this bit to Logic 1, both ADE7753 A/D converters can be turned off. 
-													In normal operation, this bit should be left at Logic 0. 
+4				ASUSPEND		0					By setting this bit to Logic 1, both ADE7753 A/D converters can be turned off.
+													In normal operation, this bit should be left at Logic 0.
 													All digital functionality can be stopped by suspending the clock signal at CLKIN pin.
-5				TEMPSEL			0					Temperature conversion starts when this bit is set to 1. 
+5				TEMPSEL			0					Temperature conversion starts when this bit is set to 1.
 													This bit is automatically reset to 0 when the temperature conversion is finished.
-6				SWRST			0					Software Chip Reset. A data transfer should not take place to the 
-													ADE7753 for at least 18 µs after a software reset.
+6				SWRST			0					Software Chip Reset. A data transfer should not take place to the
+													ADE7753 for at least 18 ï¿½s after a software reset.
 7				CYCMODE			0					Setting this bit to Logic 1 places the chip into line cycle energy accumulation mode.
 8				DISCH1			0					ADC 1 (Channel 1) inputs are internally shorted together.
 9				DISCH2			0					ADC 2 (Channel 2) inputs are internally shorted together.
-10				SWAP			0					By setting this bit to Logic 1 the analog inputs V2P and V2N are connected to ADC 1 
+10				SWAP			0					By setting this bit to Logic 1 the analog inputs V2P and V2N are connected to ADC 1
 													and the analog inputs V1P and V1N are connected to ADC 2.
 11 to 12		DTRT			0					These bits are used to select the waveform register update rate.
 													DTRT1	DTRT0	Update Rate
@@ -110,7 +110,7 @@ Bit Location	Bit Mnemonic	Default Value 		Description
 */
 
 #define DISHPF     0x0001
-#define DISLPF2    0x0002 
+#define DISLPF2    0x0002
 #define DISCF      0x0004
 #define DISSAG     0x0008
 #define ASUSPEND   0x0010
@@ -119,7 +119,7 @@ Bit Location	Bit Mnemonic	Default Value 		Description
 #define CYCMODE    0x0080
 #define DISCH1     0x0100
 #define DISCH2     0x0200
-#define SWAP	   0x0400      
+#define SWAP	   0x0400
 #define DTRT1      0x0800
 #define DTRT0      0x1000
 #define WAVSEL1    0x2000
@@ -127,31 +127,31 @@ Bit Location	Bit Mnemonic	Default Value 		Description
 #define POAM       0x8000
 
 /*INTERRUPT STATUS REGISTER (0x0B), RESET INTERRUPT STATUS REGISTER (0x0C), INTERRUPT ENABLE REGISTER (0x0A)
-The status register is used by the MCU to determine the source of an interrupt request (IRQ). 
-When an interrupt event occurs in the ADE7753, the corresponding flag in the interrupt status register is set to logic high. 
-If the enable bit for this flag is Logic 1 in the interrupt enable register, the IRQ logic output goes active low. 
+The status register is used by the MCU to determine the source of an interrupt request (IRQ).
+When an interrupt event occurs in the ADE7753, the corresponding flag in the interrupt status register is set to logic high.
+If the enable bit for this flag is Logic 1 in the interrupt enable register, the IRQ logic output goes active low.
 When the MCU services the interrupt, it must first carry out a read from the interrupt status register to determine the source of the interrupt.
 
 
 Bit Location	Interrupt Flag		Description
 0				AEHF				Indicates that an interrupt occurred because the active energy register, AENERGY, is more than half full.
 1				SAG					Indicates that an interrupt was caused by a SAG on the line voltage.
-2				CYCEND				Indicates the end of energy accumulation over an integer number of half line cycles as defined by 
-									the content of the LINECYC register—see the Line Cycle Energy Accumulation Mode section.
+2				CYCEND				Indicates the end of energy accumulation over an integer number of half line cycles as defined by
+									the content of the LINECYC registerï¿½see the Line Cycle Energy Accumulation Mode section.
 3				WSMP				Indicates that new data is present in the waveform register.
-4				ZX					This status bit is set to Logic 0 on the rising and falling edge of the the voltage waveform. 
+4				ZX					This status bit is set to Logic 0 on the rising and falling edge of the the voltage waveform.
 									See the Zero-Crossing Detection section.
 5				TEMP				Indicates that a temperature conversion result is available in the temperature register.
-6				RESET				Indicates the end of a reset (for both software or hardware reset). 
-									The corresponding enable bit has no function in the interrupt enable register, i.e., 
+6				RESET				Indicates the end of a reset (for both software or hardware reset).
+									The corresponding enable bit has no function in the interrupt enable register, i.e.,
 									this status bit is set at the end of a reset, but it cannot be enabled to cause an interrupt.
 7				AEOF				Indicates that the active energy register has overflowed.
 8				PKV					Indicates that waveform sample from Channel 2 has exceeded the VPKLVL value.
 9				PKI					Indicates that waveform sample from Channel 1 has exceeded the IPKLVL value.
 A				VAEHF				Indicates that an interrupt occurred because the active energy register, VAENERGY, is more than half full.
 B				VAEOF				Indicates that the apparent energy register has overflowed.
-C				ZXTO				Indicates that an interrupt was caused by a missing zero crossing on the line voltage for the 
-									specified number of line cycles—see the Zero-Crossing Timeout section.
+C				ZXTO				Indicates that an interrupt was caused by a missing zero crossing on the line voltage for the
+									specified number of line cyclesï¿½see the Zero-Crossing Timeout section.
 D				PPOS				Indicates that the power has gone from negative to positive.
 E				PNEG				Indicates that the power has gone from positive to negative.
 F				RESERVED			Reserved.
@@ -163,7 +163,7 @@ F				RESERVED			Reserved.
 #define		CYCEND	0x04
 #define		WSMP	0x08
 #define		ZX		0x10
-#define		TEMP	0x20
+#define		TEMPC	0x20
 #define		RESET	0x40
 #define		AEOF	0x80
 #define		PKV		0x0100
@@ -176,19 +176,19 @@ F				RESERVED			Reserved.
 
 /*
 CH1OS REGISTER (0x0D)
-The CH1OS register is an 8-bit, read/write enabled register. 
-The MSB of this register is used to switch on/off the digital integrator in Channel 1, 
+The CH1OS register is an 8-bit, read/write enabled register.
+The MSB of this register is used to switch on/off the digital integrator in Channel 1,
 and Bits 0 to 5 indicates the amount of the offset correction in Channel 1.
 
 Bit Location	Bit Mnemonic		Description
-5 to 0			OFFSET				The six LSBs of the CH1OS register control the amount of dc offset correction in Channel 1 ADC. 
-									The 6-bit offset correction is sign and magnitude coded. 
-									Bits 0 to 4 indicate the magnitude of the offset correction. 
-									Bit 5 shows the sign of the offset correction. 
+5 to 0			OFFSET				The six LSBs of the CH1OS register control the amount of dc offset correction in Channel 1 ADC.
+									The 6-bit offset correction is sign and magnitude coded.
+									Bits 0 to 4 indicate the magnitude of the offset correction.
+									Bit 5 shows the sign of the offset correction.
 									A 0 in Bit 5 means the offset correction is positive and a 1 indicates the offset correction is negative.
 6				Not Used			This bit is unused.
-7				INTEGRATOR			This bit is used to activate the digital integrator on Channel 1. 
-									The digital integrator is switched on by setting this bit. 
+7				INTEGRATOR			This bit is used to activate the digital integrator on Channel 1.
+									The digital integrator is switched on by setting this bit.
 									This bit is set to be 0 on default.
 */
 
@@ -196,7 +196,7 @@ Bit Location	Bit Mnemonic		Description
 
 /*
 GAIN REGISTER (0x0F)
-The PGA configuration of the ADE7753 is defined by writing to the GAIN register. 
+The PGA configuration of the ADE7753 is defined by writing to the GAIN register.
 Table 18 summarizes the functionality of each bit in the GAIN register.
 
 Bit Location		Bit Mnemonic		Default Value		Description
@@ -242,7 +242,7 @@ Bit Location		Bit Mnemonic		Default Value		Description
 
 
 class ADE7753 {
-  
+
 //public methods
    public:
     ADE7753();
@@ -250,9 +250,9 @@ class ADE7753 {
     void setSPI(void);
     void closeSPI(void);
 
-//----------------------------------------------------------------------------      
+//----------------------------------------------------------------------------
 // Modos y configs
-//----------------------------------------------------------------------------      
+//----------------------------------------------------------------------------
 	unsigned char getVersion();
 	void setMode(int m);
 	int getMode();
@@ -283,7 +283,7 @@ class ADE7753 {
 	long getWatt();
 	long getVar(void);
 	long getVa(void);
-            
+
 //private methods
    private:
       unsigned char read8(char reg);
@@ -291,7 +291,7 @@ class ADE7753 {
       unsigned long read24(char reg);
       void write16(char reg, int data);
       void write8(char reg, char data);
-      void enableChip(void);  
+      void enableChip(void);
       void disableChip(void);
 
 };

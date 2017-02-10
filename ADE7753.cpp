@@ -9,11 +9,9 @@ Last update: 7 Dic 2012
 
 Analog Front End para el sistema Mew monofasico.
 
-*/  
+*/
 #include "ADE7753.h"
 #include <string.h>
-#include <avr/pgmspace.h>
-#include <SPI.h>
 
 
 /** === ADE7753 ===
@@ -74,7 +72,7 @@ void ADE7753::enableChip(void){
 *
 */
 void ADE7753::disableChip(void){
-//  digitalWrite((AFECS+8),HIGH);  
+//  digitalWrite((AFECS+8),HIGH);
    bitSet(PORTB, AFECS);  // 0: Ardu pin 8 / 1: Ardu pin 9 / 2: Ardu pin 10.
 }
 
@@ -90,9 +88,9 @@ unsigned char ADE7753::read8(char reg){
     delayMicroseconds(5);
     SPI.transfer(reg);
     delayMicroseconds(5);
-    disableChip(); 
+    disableChip();
     return (unsigned long)SPI.transfer(0x00);
- 
+
 }
 
 
@@ -113,7 +111,7 @@ unsigned int ADE7753::read16(char reg){
     b0=SPI.transfer(0x00);
     disableChip();
     return (unsigned int)b1<<8 | (unsigned int)b0;
- 
+
 }
 
 
@@ -134,9 +132,9 @@ unsigned long ADE7753::read24(char reg){
     b1=SPI.transfer(0x00);
     delayMicroseconds(5);
     b0=SPI.transfer(0x00);
-    disableChip(); 
+    disableChip();
     return (unsigned long)b2<<16 | (unsigned long)b1<<8 | (unsigned long)b0;
- 
+
 }
 
 
@@ -174,15 +172,15 @@ void ADE7753::write16(char reg, int data){
     //split data
     data0 = (unsigned char)data;
     data1 = (unsigned char)(data>>8);
-    
+
     //register selection, we have to send a 1 on the 8th bit to perform a write
     delayMicroseconds(10);
-    SPI.transfer((unsigned char)reg);    
-    delayMicroseconds(5);    
+    SPI.transfer((unsigned char)reg);
+    delayMicroseconds(5);
     //data send, MSB first
     SPI.transfer((unsigned char)data1);
     delayMicroseconds(5);
-    SPI.transfer((unsigned char)data0);  
+    SPI.transfer((unsigned char)data0);
     delayMicroseconds(5);
     disableChip();
 }
@@ -214,17 +212,17 @@ Bit Location	Bit Mnemonic	Default Value 		Description
 1				DISLPF2			0					LPF (low-pass filter) after the multiplier (LPF2) is disabled when this bit is set.
 2				DISCF			1					Frequency output CF is disabled when this bit is set.
 3				DISSAG			1					Line voltage sag detection is disabled when this bit is set.
-4				ASUSPEND		0					By setting this bit to Logic 1, both ADE7753 A/D converters can be turned off. 
-													In normal operation, this bit should be left at Logic 0. 
+4				ASUSPEND		0					By setting this bit to Logic 1, both ADE7753 A/D converters can be turned off.
+													In normal operation, this bit should be left at Logic 0.
 													All digital functionality can be stopped by suspending the clock signal at CLKIN pin.
-5				TEMPSEL			0					Temperature conversion starts when this bit is set to 1. 
+5				TEMPSEL			0					Temperature conversion starts when this bit is set to 1.
 													This bit is automatically reset to 0 when the temperature conversion is finished.
-6				SWRST			0					Software Chip Reset. A data transfer should not take place to the 
+6				SWRST			0					Software Chip Reset. A data transfer should not take place to the
 													ADE7753 for at least 18 µs after a software reset.
 7				CYCMODE			0					Setting this bit to Logic 1 places the chip into line cycle energy accumulation mode.
 8				DISCH1			0					ADC 1 (Channel 1) inputs are internally shorted together.
 9				DISCH2			0					ADC 2 (Channel 2) inputs are internally shorted together.
-10				SWAP			0					By setting this bit to Logic 1 the analog inputs V2P and V2N are connected to ADC 1 
+10				SWAP			0					By setting this bit to Logic 1 the analog inputs V2P and V2N are connected to ADC 1
 													and the analog inputs V1P and V1N are connected to ADC 2.
 11 to 12		DTRT			0					These bits are used to select the waveform register update rate.
 													DTRT1	DTRT0	Update Rate
@@ -250,7 +248,7 @@ int ADE7753::getMode(){
 /** === gainSetup ===
 
 GAIN REGISTER (0x0F)
-The PGA configuration of the ADE7753 is defined by writing to the GAIN register. 
+The PGA configuration of the ADE7753 is defined by writing to the GAIN register.
 Table 18 summarizes the functionality of each bit in the GAIN register.
 
 Bit Location		Bit Mnemonic		Default Value		Description
@@ -285,30 +283,30 @@ write8(CH1OS,ch1os);
 
 /**	getStatus()/resetStatus()/getInterrupts()/setInterrupts(int i)
 INTERRUPT STATUS REGISTER (0x0B), RESET INTERRUPT STATUS REGISTER (0x0C), INTERRUPT ENABLE REGISTER (0x0A)
-The status register is used by the MCU to determine the source of an interrupt request (IRQ). 
-When an interrupt event occurs in the ADE7753, the corresponding flag in the interrupt status register is set to logic high. 
-If the enable bit for this flag is Logic 1 in the interrupt enable register, the IRQ logic output goes active low. 
+The status register is used by the MCU to determine the source of an interrupt request (IRQ).
+When an interrupt event occurs in the ADE7753, the corresponding flag in the interrupt status register is set to logic high.
+If the enable bit for this flag is Logic 1 in the interrupt enable register, the IRQ logic output goes active low.
 When the MCU services the interrupt, it must first carry out a read from the interrupt status register to determine the source of the interrupt.
 
 
 Bit Location	Interrupt Flag		Description
 0				AEHF				Indicates that an interrupt occurred because the active energy register, AENERGY, is more than half full.
 1				SAG					Indicates that an interrupt was caused by a SAG on the line voltage.
-2				CYCEND				Indicates the end of energy accumulation over an integer number of half line cycles as defined by 
+2				CYCEND				Indicates the end of energy accumulation over an integer number of half line cycles as defined by
 									the content of the LINECYC register—see the Line Cycle Energy Accumulation Mode section.
 3				WSMP				Indicates that new data is present in the waveform register.
-4				ZX					This status bit is set to Logic 0 on the rising and falling edge of the the voltage waveform. 
+4				ZX					This status bit is set to Logic 0 on the rising and falling edge of the the voltage waveform.
 									See the Zero-Crossing Detection section.
 5				TEMP				Indicates that a temperature conversion result is available in the temperature register.
-6				RESET				Indicates the end of a reset (for both software or hardware reset). 
-									The corresponding enable bit has no function in the interrupt enable register, i.e., 
+6				RESET				Indicates the end of a reset (for both software or hardware reset).
+									The corresponding enable bit has no function in the interrupt enable register, i.e.,
 									this status bit is set at the end of a reset, but it cannot be enabled to cause an interrupt.
 7				AEOF				Indicates that the active energy register has overflowed.
 8				PKV					Indicates that waveform sample from Channel 2 has exceeded the VPKLVL value.
 9				PKI					Indicates that waveform sample from Channel 1 has exceeded the IPKLVL value.
 A				VAEHF				Indicates that an interrupt occurred because the active energy register, VAENERGY, is more than half full.
 B				VAEOF				Indicates that the apparent energy register has overflowed.
-C				ZXTO				Indicates that an interrupt was caused by a missing zero crossing on the line voltage for the 
+C				ZXTO				Indicates that an interrupt was caused by a missing zero crossing on the line voltage for the
 									specified number of line cycles—see the Zero-Crossing Timeout section.
 D				PPOS				Indicates that the power has gone from negative to positive.
 E				PNEG				Indicates that the power has gone from positive to negative.
@@ -331,7 +329,7 @@ int ADE7753::resetStatus(void){
 /** === getIRMS ===
 * Channel 2 RMS Value (Current Channel).
 * The update rate of the Channel 2 rms measurement is CLKIN/4.
-* To minimize noise, synchronize the reading of the rms register with the zero crossing 
+* To minimize noise, synchronize the reading of the rms register with the zero crossing
 * of the voltage input and take the average of a number of readings.
 * @param none
 * @return long with the data (24 bits unsigned).
@@ -357,7 +355,7 @@ long ADE7753::getIRMS(void){
 /** === getVRMS ===
 * Channel 2 RMS Value (Voltage Channel).
 * The update rate of the Channel 2 rms measurement is CLKIN/4.
-* To minimize noise, synchronize the reading of the rms register with the zero crossing 
+* To minimize noise, synchronize the reading of the rms register with the zero crossing
 * of the voltage input and take the average of a number of readings.
 * @param none
 * @return long with the data (24 bits unsigned).
@@ -381,13 +379,13 @@ long ADE7753::getVRMS(void){
 }
 
 /** === vrms ===
-* Returns the mean of last 100 readings of RMS voltage. Also supress first reading to avoid 
+* Returns the mean of last 100 readings of RMS voltage. Also supress first reading to avoid
 * corrupted data.
 * rms measurement update rate is CLKIN/4.
-* To minimize noise, synchronize the reading of the rms register with the zero crossing 
+* To minimize noise, synchronize the reading of the rms register with the zero crossing
 * of the voltage input and take the average of a number of readings.
 * @param none
-* @return long with RMS voltage value 
+* @return long with RMS voltage value
 */
 long ADE7753::vrms(){
 	char i=0;
@@ -404,10 +402,10 @@ long ADE7753::vrms(){
 }
 
 /** === irms ===
-* Returns the mean of last 100 readings of RMS current. Also supress first reading to avoid 
+* Returns the mean of last 100 readings of RMS current. Also supress first reading to avoid
 * corrupted data.
 * rms measurement update rate is CLKIN/4.
-* To minimize noise, synchronize the reading of the rms register with the zero crossing 
+* To minimize noise, synchronize the reading of the rms register with the zero crossing
 * of the voltage input and take the average of a number of readings.
 * @param none
 * @return long with RMS current value in hundreds of [mA], ie. 6709=67[mA]
@@ -435,8 +433,8 @@ int ADE7753::getPeriod(void){
 }
 
 /**
- * Line Cycle Energy Accumulation Mode Line-Cycle Register. 
- * This 16-bit register is used during line cycle energy accumulation  mode 
+ * Line Cycle Energy Accumulation Mode Line-Cycle Register.
+ * This 16-bit register is used during line cycle energy accumulation  mode
  * to set the number of half line cycles for energy accumulation
  * @param none
  * @return int with the data (16 bits unsigned).
@@ -502,7 +500,7 @@ void ADE7753::setIPeakLevel(char d){
 
 /**
  * Channel 2 Peak Level Threshold (Voltage Channel). This register sets the level of the
- * voltage peak detection. If the Channel 2 input exceeds this level, 
+ * voltage peak detection. If the Channel 2 input exceeds this level,
  * the PKV flag in the status register is set.
  * @param none
  * @return char with the data (8bits unsigned).
@@ -542,16 +540,16 @@ long lastupdate = 0;
 char t_of = 0;
 int m = 0;
 m = m | DISCF | DISSAG | CYCMODE;
-setMode(m);				
+setMode(m);
 resetStatus();
 setLineCyc(Ciclos);
 lastupdate = millis();
 while(!(getStatus() & CYCEND))   // wait to terminar de acumular
 	{ // wait for the selected interrupt to occur
-		if ((millis() - lastupdate) > (Ciclos*20)) 
+		if ((millis() - lastupdate) > (Ciclos*20))
 		{
-		t_of = 1;		
-		break;  
+		t_of = 1;
+		break;
 		}
 	}
 if(t_of){
@@ -561,10 +559,10 @@ resetStatus();
 lastupdate = millis();
 while(!(getStatus() & CYCEND))   // wait to terminar de acumular
 	{ // wait for the selected interrupt to occur
-		if ((millis() - lastupdate) > (Ciclos*20)) 
+		if ((millis() - lastupdate) > (Ciclos*20))
 		{
-		t_of = 1;		
-		break;  
+		t_of = 1;
+		break;
 		}
 	}
 	if(t_of){
@@ -587,7 +585,3 @@ long ADE7753::getVa(){
 return read24(LVAENERGY);
 
 }
-
-
-
- 
