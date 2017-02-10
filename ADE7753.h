@@ -246,7 +246,7 @@ class ADE7753 {
 //public methods
    public:
     ADE7753();
-	void Init(void);
+	void Init(unsigned char AFECS);
     void setSPI(void);
     void closeSPI(void);
 
@@ -293,6 +293,7 @@ class ADE7753 {
       void write8(char reg, char data);
       void enableChip(void);
       void disableChip(void);
+      unsigned char AFECS = 13;
 
 };
 
