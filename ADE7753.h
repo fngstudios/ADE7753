@@ -18,7 +18,7 @@ Defines
 =================================================================================================*/
 
 // Class Atributes
-#define AFECS 1                	//Chip Select ADE7753 se le suma luego 8 para compatibilizar con la funcion digitalWrite()
+                	//Chip Select ADE7753 se le suma luego 8 para compatibilizar con la funcion digitalWrite()
 #define WRITE 0x80				//Valor del addres para la funcion Write.
 #define CLKIN 3579545         	//ADE7753 frec, max 4MHz
 #define PERIODO 50				//Frecuencia de Red
@@ -246,7 +246,7 @@ class ADE7753 {
 //public methods
    public:
     ADE7753();
-	void Init(unsigned char AFECS);
+	void Init(unsigned char AFECSp);
     void setSPI(void);
     void closeSPI(void);
 

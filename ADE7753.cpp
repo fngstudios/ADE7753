@@ -25,8 +25,9 @@ Analog Front End para el sistema Mew monofasico.
 
   }
 
-void ADE7753::Init(unsigned char AFECS){
+void ADE7753::Init(unsigned char AFECSp){
 	// SPI Init
+  AFECS = AFECSp;
 	pinMode(AFECS,OUTPUT);
 	digitalWrite(AFECS, HIGH);//disabled by default
 	SPI.setDataMode(SPI_MODE2);
