@@ -158,14 +158,14 @@ F				RESERVED			Reserved.
 
 */
 
-#define		AEHF	0x01
-#define		SAG		0x02
-#define		CYCEND	0x04
-#define		WSMP	0x08
-#define		ZX		0x10
-#define		TEMPC	0x20
-#define		RESET	0x40
-#define		AEOF	0x80
+#define		AEHF	0x0001
+#define		SAG		0x0002
+#define		CYCEND	0x0004
+#define		WSMP	0x0008
+#define		ZX		0x0010
+#define		TEMPC	0x0020
+#define		RESET	0x0040
+#define		AEOF	0x0080
 #define		PKV		0x0100
 #define		PKI		0x0200
 #define		VAEHF	0x0400
@@ -246,54 +246,54 @@ class ADE7753 {
 //public methods
    public:
     ADE7753();
-	void Init(unsigned char AFECSp);
+	void Init(uint8_t AFECSp);
     void setSPI(void);
     void closeSPI(void);
 
 //----------------------------------------------------------------------------
 // Modos y configs
 //----------------------------------------------------------------------------
-	unsigned char getVersion();
-	void setMode(int m);
-	int getMode();
-	void gainSetup(char integrator, char scale, char PGA2, char PGA1);
-	int getInterrupts(void);
-	void setInterrupts(int i);
-	int getStatus(void);
-	int resetStatus(void);
-	long getIRMS(void);
-	long getVRMS(void);
-	long vrms();
-	long irms();
-	int getPeriod(void);
-	void setLineCyc(int d);
-	void setZeroCrossingTimeout(int d);
-	int getZeroCrossingTimeout();
-	char getSagCycles();
-	void setSagCycles(char d);
-	char getSagVoltageLevel();
-	void setSagVoltageLevel(char d);
-	char getIPeakLevel();
-	void setIPeakLevel(char d);
-	char getVPeakLevel();
-	void setVPeakLevel(char d);
-	long getIpeakReset(void);
-	long getVpeakReset(void);
-	char setPotLine(int Ciclos);
-	long getWatt();
-	long getVar(void);
-	long getVa(void);
+	uint8_t getVersion();
+	void setMode(uint16_t m);
+	uint16_t getMode();
+	void gainSetup(uint8_t integrator, uint8_t scale, uint8_t PGA2, uint8_t PGA1);
+	uint16_t getInterrupts(void);
+	void setInterrupts(uint16_t i);
+	uint16_t getStatus(void);
+	uint16_t resetStatus(void);
+	uint32_t getIRMS(void);
+	uint32_t getVRMS(void);
+	uint32_t vrms();
+	uint32_t irms();
+	uint16_t getPeriod(void);
+	void setLineCyc(uint16_t d);
+	void setZeroCrossingTimeout(uint16_t d);
+	uint16_t getZeroCrossingTimeout();
+	uint8_t getSagCycles();
+	void setSagCycles(uint8_t d);
+	uint8_t getSagVoltageLevel();
+	void setSagVoltageLevel(uint8_t d);
+	uint8_t getIPeakLevel();
+	void setIPeakLevel(uint8_t d);
+	uint8_t getVPeakLevel();
+	void setVPeakLevel(uint8_t d);
+	uint32_t getIpeakReset(void);
+	uint32_t getVpeakReset(void);
+	uint8_t setPotLine(uint16_t Ciclos);
+	uint32_t getWatt();
+	uint32_t getVar(void);
+	uint32_t getVa(void);
 
 //private methods
    private:
-      unsigned char read8(char reg);
-      unsigned int read16(char reg);
-      unsigned long read24(char reg);
-      void write16(char reg, int data);
-      void write8(char reg, char data);
+      uint8_t read8(uint8_t reg);
+      uint16_t read16(uint8_t reg);
+      uint32_t read24(uint8_t reg);
+      void write16(uint8_t reg, uint16_t data);
+      void write8(uint8_t reg, uint8_t data);
       void enableChip(void);
       void disableChip(void);
-      unsigned char AFECS = 13;
+      uint8_t AFECS = 13;
 
 };
 

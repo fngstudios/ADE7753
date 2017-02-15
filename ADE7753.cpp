@@ -25,9 +25,9 @@ Analog Front End para el sistema Mew monofasico.
 
   }
 
-void ADE7753::Init(unsigned char AFECSp){
+void ADE7753::Init(uint8_t AFECSp){
 	// SPI Init
-  AFECS = AFECSp;
+	AFECS = AFECSp;
 	pinMode(AFECS,OUTPUT);
 	digitalWrite(AFECS, HIGH);//disabled by default
 	SPI.setDataMode(SPI_MODE2);
@@ -83,13 +83,16 @@ void ADE7753::disableChip(void){
  * @return char with contents of register
  *
  */
-unsigned char ADE7753::read8(char reg){
+uint8_t ADE7753::read8(uint8_t reg){
     enableChip();
+	SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE2));
+    uint8_t b0;
     delayMicroseconds(5);
     SPI.transfer(reg);
     delayMicroseconds(5);
+    b0 = SPI.transfer(0x00);
     disableChip();
-    return (unsigned long)SPI.transfer(0x00);
+    return b0;
 
 }
 
@@ -100,9 +103,9 @@ unsigned char ADE7753::read8(char reg){
  * @return int with contents of register
  *
  */
-unsigned int ADE7753::read16(char reg){
+uint16_t ADE7753::read16(uint8_t reg){
     enableChip();
-    unsigned char b1,b0;
+    uint8_t b1,b0;
     delayMicroseconds(5);
     SPI.transfer(reg);
     delayMicroseconds(5);
@@ -110,7 +113,7 @@ unsigned int ADE7753::read16(char reg){
     delayMicroseconds(5);
     b0=SPI.transfer(0x00);
     disableChip();
-    return (unsigned int)b1<<8 | (unsigned int)b0;
+    return (uint16_t)b1<<8 | (uint16_t)b0;
 
 }
 
@@ -121,9 +124,9 @@ unsigned int ADE7753::read16(char reg){
  * @return: char with contents of register
  *
  */
-unsigned long ADE7753::read24(char reg){
+uint32_t ADE7753::read24(uint8_t reg){
     enableChip();
-    unsigned char b2,b1,b0;
+    uint8_t b2,b1,b0;
     delayMicroseconds(10);
     SPI.transfer(reg);
     delayMicroseconds(25);
@@ -133,7 +136,7 @@ unsigned long ADE7753::read24(char reg){
     delayMicroseconds(5);
     b0=SPI.transfer(0x00);
     disableChip();
-    return (unsigned long)b2<<16 | (unsigned long)b1<<8 | (unsigned long)b0;
+    return (uint32_t)b2<<16 | (uint32_t)b1<<8 | (uint32_t)b0;
 
 }
 
@@ -145,14 +148,14 @@ unsigned long ADE7753::read24(char reg){
  * @param data char, 8 bits of data to send
  *
  */
-void ADE7753::write8(char reg, char data){
+void ADE7753::write8(uint8_t reg, uint8_t data){
     enableChip();
     //we have to send a 1 on the 8th bit in order to perform a write
     reg |= WRITE;
     delayMicroseconds(10);
-    SPI.transfer((unsigned char)reg);          //register selection
+    SPI.transfer((uint8_t)reg);          //register selection
     delayMicroseconds(5);
-    SPI.transfer((unsigned char)data);
+    SPI.transfer((uint8_t)data);
     delayMicroseconds(5);
     disableChip();
 }
@@ -164,23 +167,22 @@ void ADE7753::write8(char reg, char data){
  * @param data: int, 16 bits of data to send
  *
  */
-void ADE7753::write16(char reg, int data){
+void ADE7753::write16(uint8_t reg, uint16_t data){
     enableChip();
-    char aux=reg;
-    unsigned char data0=0,data1=0;
+    uint8_t data0=0,data1=0;
     reg |= WRITE;
     //split data
-    data0 = (unsigned char)data;
-    data1 = (unsigned char)(data>>8);
+    data0 = (uint8_t)data;
+    data1 = (uint8_t)(data>>8);
 
     //register selection, we have to send a 1 on the 8th bit to perform a write
     delayMicroseconds(10);
-    SPI.transfer((unsigned char)reg);
+    SPI.transfer((uint8_t)reg);
     delayMicroseconds(5);
     //data send, MSB first
-    SPI.transfer((unsigned char)data1);
+    SPI.transfer((uint8_t)data1);
     delayMicroseconds(5);
-    SPI.transfer((unsigned char)data0);
+    SPI.transfer((uint8_t)data0);
     delayMicroseconds(5);
     disableChip();
 }
@@ -198,7 +200,7 @@ void ADE7753::write16(char reg, int data){
  * @return: register content (measure) of the proper type depending on register width
  */
 
-unsigned char ADE7753::getVersion(){
+uint8_t ADE7753::getVersion(){
 return read8(DIEREV);
 }
 
@@ -238,10 +240,10 @@ Bit Location	Bit Mnemonic	Default Value 		Description
 													1	1			24 bits Channel 2
 15				POAM			0					Writing Logic 1 to this bit allows only positive active power to be accumulated in the ADE7753.
 */
-void ADE7753::setMode(int m){
+void ADE7753::setMode(uint16_t m){
     write16(MODE, m);
 }
-int ADE7753::getMode(){
+uint16_t ADE7753::getMode(){
     return read16(MODE);
 }
 
@@ -274,10 +276,10 @@ Bit Location		Bit Mnemonic		Default Value		Description
 															1	0	0			x16
 */
 
-void ADE7753::gainSetup(char integrator, char scale, char PGA2, char PGA1){
-char pgas = (PGA2<<5) | (scale<<3) | (PGA1);
+void ADE7753::gainSetup(uint8_t integrator, uint8_t scale, uint8_t PGA2, uint8_t PGA1){
+uint8_t pgas = (PGA2<<5) | (scale<<3) | (PGA1);
 write8(GAIN,pgas);//write GAIN register, format is |3 bits PGA2 gain|2 bits full scale|3 bits PGA1 gain
-char ch1os = (integrator<<7);
+uint8_t ch1os = (integrator<<7);
 write8(CH1OS,ch1os);
 }
 
@@ -313,16 +315,16 @@ E				PNEG				Indicates that the power has gone from positive to negative.
 F				RESERVED			Reserved.
 
 */
-int ADE7753::getInterrupts(void){
+uint16_t ADE7753::getInterrupts(void){
     return read16(IRQEN);
 }
-void ADE7753::setInterrupts(int i){
+void ADE7753::setInterrupts(uint16_t i){
     write16(IRQEN,i);
 }
-int ADE7753::getStatus(void){
+uint16_t ADE7753::getStatus(void){
     return read16(STATUSR);
 }
-int ADE7753::resetStatus(void){
+uint16_t ADE7753::resetStatus(void){
     return read16(RSTSTATUS);
 }
 
@@ -334,9 +336,9 @@ int ADE7753::resetStatus(void){
 * @param none
 * @return long with the data (24 bits unsigned).
 */
-long ADE7753::getIRMS(void){
-	long lastupdate = 0;
-	char t_of = 0;
+uint32_t ADE7753::getIRMS(void){
+	uint32_t lastupdate = 0;
+	uint8_t t_of = 0;
 	resetStatus(); // Clear all interrupts
 	lastupdate = millis();
 	while(!(getStatus()&ZX)){   // wait Zero-Crossing
@@ -360,9 +362,9 @@ long ADE7753::getIRMS(void){
 * @param none
 * @return long with the data (24 bits unsigned).
 */
-long ADE7753::getVRMS(void){
-	long lastupdate = 0;
-	char t_of = 0;
+uint32_t ADE7753::getVRMS(void){
+	uint32_t lastupdate = 0;
+	uint8_t t_of = 0;
 	resetStatus(); // Clear all interrupts
 	lastupdate = millis();
 	while(!(getStatus()&ZX)){// wait Zero-Crossing
@@ -387,9 +389,9 @@ long ADE7753::getVRMS(void){
 * @param none
 * @return long with RMS voltage value
 */
-long ADE7753::vrms(){
-	char i=0;
-	long v=0;
+uint32_t ADE7753::vrms(){
+	uint8_t i=0;
+	uint32_t v=0;
 	if(getVRMS()){//Ignore first reading to avoid garbage
 
 	for(i=0;i<2;++i){
@@ -410,9 +412,9 @@ long ADE7753::vrms(){
 * @param none
 * @return long with RMS current value in hundreds of [mA], ie. 6709=67[mA]
 */
-long ADE7753::irms(){
-	char n=0;
-	long i=0;
+uint32_t ADE7753::irms(){
+	uint8_t n=0;
+	uint32_t i=0;
 	if(getIRMS()){//Ignore first reading to avoid garbage
 	for(n=0;n<2;++n){
 		i+=getIRMS();
@@ -428,7 +430,7 @@ long ADE7753::irms(){
  * @param none
  * @return int with the data (16 bits unsigned).
  */
-int ADE7753::getPeriod(void){
+uint16_t ADE7753::getPeriod(void){
     return read16(PERIOD);
 }
 
@@ -439,7 +441,7 @@ int ADE7753::getPeriod(void){
  * @param none
  * @return int with the data (16 bits unsigned).
  */
-void ADE7753::setLineCyc(int d){
+void ADE7753::setLineCyc(uint16_t d){
     write16(LINECYC,d);
 }
 
@@ -450,10 +452,10 @@ void ADE7753::setLineCyc(int d){
  * @param none
  * @return int with the data (12 bits unsigned).
  */
-void ADE7753::setZeroCrossingTimeout(int d){
+void ADE7753::setZeroCrossingTimeout(uint16_t d){
     write16(ZXTOUT,d);
 }
-int ADE7753::getZeroCrossingTimeout(){
+uint16_t ADE7753::getZeroCrossingTimeout(){
     return read16(ZXTOUT);
 }
 
@@ -464,10 +466,10 @@ int ADE7753::getZeroCrossingTimeout(){
  * @param none
  * @return char with the data (8 bits unsigned).
  */
-char ADE7753::getSagCycles(){
+uint8_t ADE7753::getSagCycles(){
     return read8(SAGCYC);
 }
-void ADE7753::setSagCycles(char d){
+void ADE7753::setSagCycles(uint8_t d){
     write8(SAGCYC,d);
 }
 
@@ -478,10 +480,10 @@ void ADE7753::setSagCycles(char d){
  * @param none
  * @return char with the data (8 bits unsigned).
  */
-char ADE7753::getSagVoltageLevel(){
+uint8_t ADE7753::getSagVoltageLevel(){
     return read8(SAGLVL);
 }
-void ADE7753::setSagVoltageLevel(char d){
+void ADE7753::setSagVoltageLevel(uint8_t d){
     write8(SAGLVL,d);
 }
 
@@ -491,10 +493,10 @@ void ADE7753::setSagVoltageLevel(char d){
  * @param none
  * @return char with the data (8 bits unsigned).
  */
-char ADE7753::getIPeakLevel(){
+uint8_t ADE7753::getIPeakLevel(){
     return read8(IPKLVL);
 }
-void ADE7753::setIPeakLevel(char d){
+void ADE7753::setIPeakLevel(uint8_t d){
     write8(IPKLVL,d);
 }
 
@@ -505,10 +507,10 @@ void ADE7753::setIPeakLevel(char d){
  * @param none
  * @return char with the data (8bits unsigned).
  */
-char ADE7753::getVPeakLevel(){
+uint8_t ADE7753::getVPeakLevel(){
     return read8(VPKLVL);
 }
-void ADE7753::setVPeakLevel(char d){
+void ADE7753::setVPeakLevel(uint8_t d){
     write8(VPKLVL,d);
 }
 
@@ -517,7 +519,7 @@ void ADE7753::setVPeakLevel(char d){
  * @param none
  * @return long with the data (24 bits 24 bits unsigned).
  */
-long ADE7753::getIpeakReset(void){
+uint32_t ADE7753::getIpeakReset(void){
     return read24(RSTIPEAK);
 }
 
@@ -526,7 +528,7 @@ long ADE7753::getIpeakReset(void){
  * @param none
  * @return long with the data (24 bits  unsigned).
  */
-long ADE7753::getVpeakReset(void){
+uint32_t ADE7753::getVpeakReset(void){
     return read24(RSTVPEAK);
 }
 
@@ -535,10 +537,10 @@ Setea las condiciones para Line accumulation.
 Luego espera la interrupccion y devuelve 1 cuando ocurre.
 Si no ocurre por mas de 1,5 segundos devuelve un 0.
 **/
-char ADE7753::setPotLine(int Ciclos){
-long lastupdate = 0;
-char t_of = 0;
-int m = 0;
+uint8_t ADE7753::setPotLine(uint16_t Ciclos){
+uint32_t lastupdate = 0;
+uint8_t t_of = 0;
+uint16_t m = 0;
 m = m | DISCF | DISSAG | CYCMODE;
 setMode(m);
 resetStatus();
@@ -575,13 +577,13 @@ while(!(getStatus() & CYCEND))   // wait to terminar de acumular
 Devuelve los valores de la potencia requerida.
 Utilizar antes setPotLine() para generar los valores.
 **/
-long ADE7753::getWatt(){
+uint32_t ADE7753::getWatt(){
 return read24(LAENERGY);
 }
-long ADE7753::getVar(){
+uint32_t ADE7753::getVar(){
 return read24(LVARENERGY);
 }
-long ADE7753::getVa(){
+uint32_t ADE7753::getVa(){
 return read24(LVAENERGY);
 
 }

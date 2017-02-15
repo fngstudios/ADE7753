@@ -1,28 +1,28 @@
 {
-    "name": "ADE7753", 
+    "name": "ADE7753",
     "repository": {
-        "url": "https://github.com/fngstudios/ADE7753.git", 
+        "url": "https://github.com/fngstudios/ADE7753.git",
         "type": "git"
-    }, 
+    },
     "platforms": [
         "*"
-    ], 
+    ],
     "frameworks": [
         "arduino"
-    ], 
-    "version": "0.1", 
+    ],
+    "version": "0.2", 
     "authors": [
         {
-            "maintainer": false, 
-            "name": "fngStudios", 
-            "url": "https://github.com/fngstudios", 
+            "maintainer": false,
+            "name": "fngStudios",
+            "url": "https://github.com/fngstudios",
             "email": null
         }
-    ], 
+    ],
     "keywords": [
-        "Energy", 
+        "Energy",
         "mewSystem"
-    ],  
+    ],
     "description": "ADE7753 interface library to be improoved since this uses no interrupts.",
 	"examples": "examples/*/*.ino"
 }
