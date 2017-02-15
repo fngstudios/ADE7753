@@ -91,6 +91,7 @@ uint8_t ADE7753::read8(uint8_t reg){
     SPI.transfer(reg);
     delayMicroseconds(5);
     b0 = SPI.transfer(0x00);
+    SPI.endTransaction();
     disableChip();
     return b0;
 
@@ -105,6 +106,7 @@ uint8_t ADE7753::read8(uint8_t reg){
  */
 uint16_t ADE7753::read16(uint8_t reg){
     enableChip();
+    	SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE2));
     uint8_t b1,b0;
     delayMicroseconds(5);
     SPI.transfer(reg);
@@ -112,6 +114,7 @@ uint16_t ADE7753::read16(uint8_t reg){
     b1=SPI.transfer(0x00);
     delayMicroseconds(5);
     b0=SPI.transfer(0x00);
+    SPI.endTransaction();
     disableChip();
     return (uint16_t)b1<<8 | (uint16_t)b0;
 
@@ -126,6 +129,7 @@ uint16_t ADE7753::read16(uint8_t reg){
  */
 uint32_t ADE7753::read24(uint8_t reg){
     enableChip();
+    	SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE2));
     uint8_t b2,b1,b0;
     delayMicroseconds(10);
     SPI.transfer(reg);
@@ -135,6 +139,7 @@ uint32_t ADE7753::read24(uint8_t reg){
     b1=SPI.transfer(0x00);
     delayMicroseconds(5);
     b0=SPI.transfer(0x00);
+    SPI.endTransaction();
     disableChip();
     return (uint32_t)b2<<16 | (uint32_t)b1<<8 | (uint32_t)b0;
 
@@ -150,6 +155,7 @@ uint32_t ADE7753::read24(uint8_t reg){
  */
 void ADE7753::write8(uint8_t reg, uint8_t data){
     enableChip();
+    	SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE2));
     //we have to send a 1 on the 8th bit in order to perform a write
     reg |= WRITE;
     delayMicroseconds(10);
@@ -157,6 +163,7 @@ void ADE7753::write8(uint8_t reg, uint8_t data){
     delayMicroseconds(5);
     SPI.transfer((uint8_t)data);
     delayMicroseconds(5);
+    SPI.endTransaction();
     disableChip();
 }
 
@@ -169,6 +176,7 @@ void ADE7753::write8(uint8_t reg, uint8_t data){
  */
 void ADE7753::write16(uint8_t reg, uint16_t data){
     enableChip();
+    	SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE2));
     uint8_t data0=0,data1=0;
     reg |= WRITE;
     //split data
@@ -184,6 +192,7 @@ void ADE7753::write16(uint8_t reg, uint16_t data){
     delayMicroseconds(5);
     SPI.transfer((uint8_t)data0);
     delayMicroseconds(5);
+    SPI.endTransaction();
     disableChip();
 }
 
