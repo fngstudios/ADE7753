@@ -12,7 +12,7 @@ Analog Front End para el sistema Mew monofasico.
 */
 #ifndef ADE7753_H
 #define ADE7753_H
-
+#include <Arduino.h>
 /***=================================================================================================
 Defines
 =================================================================================================*/
@@ -27,48 +27,48 @@ Defines
 //Register address
 
 //------Name--------Address---------Lenght
-#define WAVEFORM 	0x01//			24
-#define AENERGY 	0x02//			24
-#define RAENERGY 	0x03//			24
-#define LAENERGY 	0x04//			24
-#define VAENERGY 	0x05//			24
+#define WAVEFORM 	  0x01//			24
+#define AENERGY 	  0x02//			24
+#define RAENERGY  	0x03//			24
+#define LAENERGY 	  0x04//			24
+#define VAENERGY 	  0x05//			24
 #define RVAENERGY 	0x06//			24
 #define LVAENERGY 	0x07//			24
 #define LVARENERGY 	0x08//			24
-#define MODE 		0x09//			16
-#define IRQEN 		0x0A//			16
+#define MODE 		    0x09//			16
+#define IRQEN 		  0x0A//			16
 #define STATUSR 		0x0B//			16
 #define RSTSTATUS 	0x0C//			16
-#define CH1OS 		0x0D//			8
-#define CH2OS 		0x0E//			8
-#define GAIN 		0x0F//			8
-#define PHCAL 		0x10//			6
-#define APOS 		0x11//			16
-#define WGAIN 		0x12//			12
-#define WDIV 		0x13//			8
-#define CFNUM 		0x14//			12
-#define CFDEN 		0x15//			12
-#define IRMS 		0x16//			24
-#define VRMS 		0x17//			24
-#define IRMSOS 		0x18//			12
-#define VRMSOS 		0x19//			12
-#define VAGAIN 		0x1A//			12
-#define VADIV 		0x1B//			8
-#define LINECYC 	0x1C//			16
-#define ZXTOUT 		0x1D//			12
-#define SAGCYC 		0x1E//			8
-#define SAGLVL 		0x1F//			8
-#define IPKLVL 		0x20//			8
-#define VPKLVL 		0x21//			8
-#define IPEAK 		0x22//			24
-#define RSTIPEAK 	0x23//			24
-#define VPEAK 		0x24//			24
-#define RSTVPEAK 	0x25//			24
-#define TEMP 		0x26//			8
-#define PERIOD 		0x27//			16
-#define TMODE 		0x3D//			8
-#define CHKSUM 		0x3E//			6
-#define DIEREV 		0X3F//			8
+#define CH1OS 		  0x0D//			8
+#define CH2OS 		  0x0E//			8
+#define GAIN 		    0x0F//			8
+#define PHCAL 		  0x10//			6
+#define APOS 		    0x11//			16
+#define WGAIN 		  0x12//			12
+#define WDIV 		    0x13//			8
+#define CFNUM 		  0x14//			12
+#define CFDEN 		  0x15//			12
+#define IRMS 		    0x16//			24
+#define VRMS 		    0x17//			24
+#define IRMSOS 		  0x18//			12
+#define VRMSOS 		  0x19//			12
+#define VAGAIN 		  0x1A//			12
+#define VADIV 		  0x1B//			8
+#define LINECYC 	  0x1C//			16
+#define ZXTOUT 		  0x1D//			12
+#define SAGCYC 		  0x1E//			8
+#define SAGLVL 		  0x1F//			8
+#define IPKLVL 		  0x20//			8
+#define VPKLVL 		  0x21//			8
+#define IPEAK 		  0x22//			24
+#define RSTIPEAK 	  0x23//			24
+#define VPEAK 		  0x24//			24
+#define RSTVPEAK  	0x25//			24
+#define TEMP 		    0x26//			8
+#define PERIOD 		  0x27//			16
+#define TMODE 		  0x3D//			8
+#define CHKSUM 		  0x3E//			6
+#define DIEREV 		  0X3F//			8
 
 
 //bits
@@ -119,7 +119,7 @@ Bit Location	Bit Mnemonic	Default Value 		Description
 #define CYCMODE    0x0080
 #define DISCH1     0x0100
 #define DISCH2     0x0200
-#define SWAP	   0x0400
+#define SWAP	     0x0400
 #define DTRT1      0x0800
 #define DTRT0      0x1000
 #define WAVSEL1    0x2000
@@ -162,8 +162,8 @@ F				RESERVED			Reserved.
 #define		SAG		0x0002
 #define		CYCEND	0x0004
 #define		WSMP	0x0008
-#define		ZX		0x0010
-#define		TEMPC	0x0020
+#define		ZX		0x0020
+#define		TEMPC	0x0010
 #define		RESET	0x0040
 #define		AEOF	0x0080
 #define		PKV		0x0100
@@ -246,7 +246,7 @@ class ADE7753 {
 //public methods
    public:
     ADE7753();
-	void Init(uint8_t AFECSp);
+	void Init(uint8_t AFECSp, uint32_t spiFreq);
     void setSPI(void);
     void closeSPI(void);
 
@@ -294,6 +294,7 @@ class ADE7753 {
       void enableChip(void);
       void disableChip(void);
       uint8_t AFECS = 13;
+      uint32_t _spiFreq = 4000000;
 
 };
 
