@@ -27,10 +27,10 @@ Analog Front End para el sistema Mew monofasico.
 
 void ADE7753::Init(uint8_t AFECSp, uint32_t spiFreq){
 	// SPI Init
-	AFECS = AFECSp;
+	_AFECS = AFECSp;
   _spiFreq = spiFreq;
-	pinMode(AFECS,OUTPUT);
-	digitalWrite(AFECS, HIGH);//disabled by default
+	pinMode(_AFECS,OUTPUT);
+	digitalWrite(_AFECS, HIGH);//disabled by default
 	SPI.setDataMode(SPI_MODE2);
 	SPI.setClockDivider(SPI_CLOCK_DIV2);
 	SPI.setBitOrder(MSBFIRST);
@@ -64,7 +64,7 @@ void ADE7753::closeSPI(void) {
 *
 */
 void ADE7753::enableChip(void){
-  digitalWrite(AFECS,LOW);
+  digitalWrite(_AFECS,LOW);
 }
 
 
@@ -74,7 +74,7 @@ void ADE7753::enableChip(void){
 *
 */
 void ADE7753::disableChip(void){
-  digitalWrite(AFECS,HIGH);
+  digitalWrite(_AFECS,HIGH);
 }
 
 
@@ -399,15 +399,14 @@ uint32_t ADE7753::getVRMS(void){
 * @param none
 * @return long with RMS voltage value
 */
-uint32_t ADE7753::vrms(){
+float ADE7753::vrms(){
 	uint8_t i=0;
 	uint32_t v=0;
 	if(getVRMS()){//Ignore first reading to avoid garbage
-
-	for(i=0;i<2;++i){
+	for(i=0;i<_readingsNum+1;++i){
 		v+=getVRMS();
 	}
-	return v/2;
+	return float(v/_readingsNum)/_vconst;
 	}else{
 	return 0;
 	}
@@ -422,14 +421,14 @@ uint32_t ADE7753::vrms(){
 * @param none
 * @return long with RMS current value in hundreds of [mA], ie. 6709=67[mA]
 */
-uint32_t ADE7753::irms(){
+float ADE7753::irms(){
 	uint8_t n=0;
 	uint32_t i=0;
 	if(getIRMS()){//Ignore first reading to avoid garbage
-	for(n=0;n<2;++n){
+	for(n=0;n<_readingsNum+1;++n){
 		i+=getIRMS();
 	}
-	return i/2;
+	return float(i/_readingsNum)/_iconst;
 	}else{
 	return 0;
 	}
@@ -441,7 +440,22 @@ uint32_t ADE7753::irms(){
  * @return int with the data (16 bits unsigned).
  */
 uint16_t ADE7753::getPeriod(void){
-    return read16(PERIOD);
+  uint32_t lastupdate = 0;
+  uint8_t t_of = 0;
+  resetStatus(); // Clear all interrupts
+  lastupdate = millis();
+  while(!(getStatus()&ZX)){   // wait Zero-Crossing
+  if ((millis() - lastupdate) > 20){
+    t_of = 1;
+    break;
+    }
+  }
+  if (t_of){
+  return 0;
+  }else{
+  return read16(PERIOD);
+  }
+
 }
 
 /**
@@ -595,5 +609,25 @@ return read24(LVARENERGY);
 }
 uint32_t ADE7753::getVa(){
 return read24(LVAENERGY);
+}
+void ADE7753::setIntPin(uint8_t interruptPin){
+  _interruptPin = interruptPin;
+}
+void ADE7753::setVconst(float vconst){ // cant be 0
+  if (vconst){
+  _vconst = vconst;
+  }
+}
+void ADE7753::setIconst(float iconst){
+  if (iconst){
+    _iconst = iconst;
+  }
+}
+void ADE7753::setReadingsNum(uint8_t readingsNum){
+  _readingsNum = readingsNum;
+}
+void ADE7753::setInterruptFunction( void *(function)){
+  if (_interruptPin){
 
+  }
 }

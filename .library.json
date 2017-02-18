@@ -10,7 +10,7 @@
     "frameworks": [
         "arduino"
     ],
-    "version": "0.3", 
+    "version": "0.4", 
     "authors": [
         {
             "maintainer": false,
@@ -23,6 +23,6 @@
         "Energy",
         "mewSystem"
     ],
-    "description": "ADE7753 interface library to be improoved since this uses no interrupts.",
+    "description": "ADE7753 interface library. Work in progress, esp8266 compatible, interrupts coming",
 	"examples": "examples/*/*.ino"
 }

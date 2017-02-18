@@ -162,8 +162,8 @@ F				RESERVED			Reserved.
 #define		SAG		0x0002
 #define		CYCEND	0x0004
 #define		WSMP	0x0008
-#define		ZX		0x0020
-#define		TEMPC	0x0010
+#define		ZX		0x0010
+#define		TEMPC	0x0020
 #define		RESET	0x0040
 #define		AEOF	0x0080
 #define		PKV		0x0100
@@ -246,7 +246,7 @@ class ADE7753 {
 //public methods
    public:
     ADE7753();
-	void Init(uint8_t AFECSp, uint32_t spiFreq);
+	void Init(uint8_t AFECS, uint32_t spiFreq);
     void setSPI(void);
     void closeSPI(void);
 
@@ -263,9 +263,10 @@ class ADE7753 {
 	uint16_t resetStatus(void);
 	uint32_t getIRMS(void);
 	uint32_t getVRMS(void);
-	uint32_t vrms();
-	uint32_t irms();
+	float vrms();
+	float irms();
 	uint16_t getPeriod(void);
+  float getFrecuency(void);
 	void setLineCyc(uint16_t d);
 	void setZeroCrossingTimeout(uint16_t d);
 	uint16_t getZeroCrossingTimeout();
@@ -283,7 +284,12 @@ class ADE7753 {
 	uint32_t getWatt();
 	uint32_t getVar(void);
 	uint32_t getVa(void);
-
+  void setIntPin(uint8_t interruptPin);
+  void setVconst(float vconst);
+  void setIconst(float iconst);
+  void setReadingsNum(uint8_t readingsNum);
+  void setInterruptFunction( void *(function));
+  void doInterrupts();
 //private methods
    private:
       uint8_t read8(uint8_t reg);
@@ -293,8 +299,12 @@ class ADE7753 {
       void write8(uint8_t reg, uint8_t data);
       void enableChip(void);
       void disableChip(void);
-      uint8_t AFECS = 13;
+      uint8_t _AFECS = 15;
       uint32_t _spiFreq = 4000000;
+      uint8_t _readingsNum = 2;
+      float _vconst = 1;
+      float _iconst = 1;
+      uint8_t _interruptPin = 0;
 
 };
 
