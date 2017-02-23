@@ -47,8 +47,6 @@ void ADE7753::setSPI(void) {
 
 void ADE7753::closeSPI(void) {
 	SPI.setDataMode(SPI_MODE0);
-//	SPI.setClockDivider(SPI_CLOCK_DIV32);
-//	SPI.setBitOrder(MSBFIRST);
 	delay(10);
 }
 
